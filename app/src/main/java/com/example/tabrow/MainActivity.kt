@@ -49,7 +49,10 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
-                    Greeting()
+                    Greeting(
+                        { AComposeable() },
+                        { BComposeable() }
+                    )
                 }
             }
         }
@@ -58,7 +61,10 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun Greeting() {
+fun Greeting(
+    contentA: @Composable () -> Unit,
+    contentB: @Composable () -> Unit
+) {
     val listItems by remember { mutableStateOf(listOf("title1", "title2")) }
 
     val state = rememberPagerState()
@@ -104,8 +110,8 @@ fun Greeting() {
                 userScrollEnabled = false
             ) { page ->
                 when (page) {
-                    0 -> AComposeable()
-                    1 -> BComposeable()
+                    0 -> contentA()
+                    1 -> contentB()
                 }
             }
         }
@@ -131,6 +137,15 @@ fun BComposeable(vm: BViewModel = koinViewModel()) {
 @Composable
 fun DefaultPreview() {
     TabRowTheme {
-        Greeting()
+        Greeting(
+            { AComposeable(vm = AViewModel()) },
+            { BComposeable(vm = BViewModel()) }
+        )
     }
+}
+
+@Preview(showBackground = true, widthDp = 400)
+@Composable
+fun APreview() {
+    AComposeable(vm = AViewModel())
 }
