@@ -1,14 +1,18 @@
 package com.example.tabrow
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
 class AViewModel : ViewModel() {
 
-    private val _viewState = MutableLiveData(INITIAL)
-    val viewState: LiveData<ViewState> = _viewState
+    private val _viewState = mutableStateOf(INITIAL)
+    val viewState: State<ViewState> = _viewState
+
+    init {
+        Log.d("init ViewModel A", checkNotNull(_viewState.value).message)
+    }
 
     fun updateMessage() {
         _viewState.value = checkNotNull(_viewState.value).copy(
@@ -16,6 +20,7 @@ class AViewModel : ViewModel() {
         )
         Log.d("ViewModel A", checkNotNull(_viewState.value).message)
     }
+
     data class ViewState(
         val message: String
     )
