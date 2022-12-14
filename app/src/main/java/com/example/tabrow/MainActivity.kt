@@ -88,7 +88,7 @@ fun Greeting() {
             HorizontalPager(
                 count = listItems.count(),
                 state = state,
-                reverseLayout = true
+                userScrollEnabled = false
             ) { page ->
                 when (page) {
                     0 -> Text(modifier = Modifier.heightIn(min = 1000.dp), text = "a")
