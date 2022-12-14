@@ -120,6 +120,7 @@ fun Greeting(
 
 @Composable
 fun AComposeable(vm: AViewModel = koinViewModel()) {
+    vm.updateMessage()
     vm.viewState.value?.let {
         Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
     }
@@ -128,6 +129,7 @@ fun AComposeable(vm: AViewModel = koinViewModel()) {
 
 @Composable
 fun BComposeable(vm: BViewModel = koinViewModel()) {
+    vm.updateMessage()
     vm.viewState.value?.let {
         Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
     }
