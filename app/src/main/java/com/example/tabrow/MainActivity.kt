@@ -26,10 +26,23 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val appModule = module {
+            viewModel { AViewModel() }
+            viewModel { BViewModel() }
+        }
+        startKoin {
+            modules(appModule)
+        }
+
         setContent {
             TabRowTheme {
                 // A surface container using the 'background' color from the theme
@@ -91,11 +104,26 @@ fun Greeting() {
                 userScrollEnabled = false
             ) { page ->
                 when (page) {
-                    0 -> Text(modifier = Modifier.heightIn(min = 1000.dp), text = "a")
-                    1 -> Text(modifier = Modifier.heightIn(min = 1000.dp), text = "b")
+                    0 -> AComposeable()
+                    1 -> BComposeable()
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AComposeable(vm: AViewModel = koinViewModel()) {
+    vm.viewState.value?.let {
+        Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
+    }
+
+}
+
+@Composable
+fun BComposeable(vm: BViewModel = koinViewModel()) {
+    vm.viewState.value?.let {
+        Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
     }
 }
 
