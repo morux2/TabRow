@@ -16,32 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tabrow.ui.theme.TabRowTheme
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.context.GlobalContext.startKoin
-import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val appModule = module {
-            viewModel { AViewModel() }
-            viewModel { BViewModel() }
-        }
-        startKoin {
-            modules(appModule)
-        }
 
         setContent {
             TabRowTheme {
@@ -50,8 +34,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
                     Greeting(
-                        { AComposeable() },
-                        { BComposeable() }
+                        { AComposable() },
+                        { BComposable() }
                     )
                 }
             }
@@ -59,16 +43,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Greeting(
     contentA: @Composable () -> Unit,
     contentB: @Composable () -> Unit
 ) {
-    val listItems by remember { mutableStateOf(listOf("title1", "title2")) }
 
-    val state = rememberPagerState()
-    val coroutineScope = rememberCoroutineScope()
+    var state by remember { mutableStateOf(0) }
+    val listItems = listOf("tab1", "tab2")
+
     LazyColumn {
         item {
             Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear1")
@@ -84,18 +68,15 @@ fun Greeting(
         }
         stickyHeader {
             TabRow(
-                selectedTabIndex = state.currentPage, backgroundColor = Color.White
+                selectedTabIndex = state, backgroundColor = Color.White
             ) {
                 // Add tabs for all of our pages
                 listItems.forEachIndexed { index, title ->
                     Tab(
                         text = { Text(text = title) },
-                        selected = state.currentPage == index,
+                        selected = state == index,
                         onClick = {
-                            // Animate to the selected page when clicked
-                            coroutineScope.launch {
-                                state.animateScrollToPage(index)
-                            }
+                            state = index
                         },
                         selectedContentColor = Color.Black,
                         unselectedContentColor = Color.Gray
@@ -104,50 +85,27 @@ fun Greeting(
             }
         }
         item {
-            HorizontalPager(
-                count = listItems.count(),
-                state = state,
-                userScrollEnabled = false
-            ) { page ->
-                when (page) {
-                    0 -> contentA()
-                    1 -> contentB()
-                }
+            when (state) {
+                0 -> AComposable()
+                1 -> BComposable()
             }
         }
     }
 }
 
 @Composable
-fun AComposeable(vm: AViewModel = koinViewModel()) {
+fun AComposable(vm: AViewModel = koinViewModel()) {
     vm.updateMessage()
-    vm.viewState.value?.let {
+    vm.viewState.value.let {
         Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
     }
 
 }
 
 @Composable
-fun BComposeable(vm: BViewModel = koinViewModel()) {
+fun BComposable(vm: BViewModel = koinViewModel()) {
     vm.updateMessage()
-    vm.viewState.value?.let {
+    vm.viewState.value.let {
         Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    TabRowTheme {
-        Greeting(
-            { AComposeable(vm = AViewModel()) },
-            { BComposeable(vm = BViewModel()) }
-        )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 400)
-@Composable
-fun APreview() {
-    AComposeable(vm = AViewModel())
 }
