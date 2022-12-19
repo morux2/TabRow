@@ -7,6 +7,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
@@ -15,12 +16,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.tabrow.ui.theme.TabRowTheme
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -52,8 +55,12 @@ fun Greeting(
 
     var state by rememberSaveable { mutableStateOf(0) }
     val listItems = listOf("tab1", "tab2")
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
-    LazyColumn {
+    LazyColumn(
+        state = listState
+    ) {
         item {
             Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear1")
         }
@@ -77,6 +84,10 @@ fun Greeting(
                         selected = state == index,
                         onClick = {
                             state = index
+                            coroutineScope.launch {
+                                if (listState.firstVisibleItemIndex > 4)
+                                listState.scrollToItem(4)
+                            }
                         },
                         selectedContentColor = Color.Black,
                         unselectedContentColor = Color.Gray
