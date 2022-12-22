@@ -60,5 +60,15 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
-    implementation "com.google.accompanist:accompanist-pager:0.28.0"
+
+    // Koin main features for Android
+    implementation "io.insert-koin:koin-android:$koin_android_version"
+    // Java Compatibility
+    implementation "io.insert-koin:koin-android-compat:$koin_android_version"
+    // Jetpack WorkManager
+    implementation "io.insert-koin:koin-androidx-workmanager:$koin_android_version"
+    // Navigation Graph
+    implementation "io.insert-koin:koin-androidx-navigation:$koin_android_version"
+    // Jetpack Compose
+    implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
 }
