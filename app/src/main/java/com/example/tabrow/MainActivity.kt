@@ -10,12 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -60,7 +56,7 @@ fun Greeting(
     aClickEvent: AViewModel.aClickEvent,
     bClickEvent: BViewModel.bClickEvent
 ) {
-    var state by rememberSaveable { mutableStateOf(0) }
+    var tabState by rememberSaveable { mutableStateOf(0) }
     val listItems = listOf("tab1", "tab2")
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -81,15 +77,15 @@ fun Greeting(
         }
         stickyHeader {
             TabRow(
-                selectedTabIndex = state, backgroundColor = Color.White
+                selectedTabIndex = tabState, backgroundColor = Color.White
             ) {
                 // Add tabs for all of our pages
                 listItems.forEachIndexed { index, title ->
                     Tab(
                         text = { Text(text = title) },
-                        selected = state == index,
+                        selected = tabState == index,
                         onClick = {
-                            state = index
+                            tabState = index
                             coroutineScope.launch {
                                 if (listState.firstVisibleItemIndex > 4)
                                     listState.scrollToItem(4)
@@ -101,7 +97,7 @@ fun Greeting(
                 }
             }
         }
-        when (state) {
+        when (tabState) {
             0 -> showAComposable(aViewState, this, aClickEvent)
             1 -> showBComposable(bViewState, this, bClickEvent)
         }
