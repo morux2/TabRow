@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tabrow.ui.theme.TabRowTheme
 import kotlinx.coroutines.launch
@@ -119,4 +120,17 @@ fun BComposable(vm: BViewModel = koinViewModel()) {
     vm.viewState.value.let {
         Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
     }
+}
+
+@Preview(heightDp = 100)
+@Composable
+fun APreview() {
+    AComposable(vm = AViewModel())
+}
+
+
+@Preview(heightDp = 100)
+@Composable
+fun BPreview() {
+    BComposable(vm = BViewModel())
 }
