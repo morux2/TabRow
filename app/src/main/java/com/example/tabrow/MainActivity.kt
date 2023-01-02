@@ -86,7 +86,7 @@ fun Greeting(
                             state = index
                             coroutineScope.launch {
                                 if (listState.firstVisibleItemIndex > 4)
-                                listState.scrollToItem(4)
+                                    listState.scrollToItem(4)
                             }
                         },
                         selectedContentColor = Color.Black,
