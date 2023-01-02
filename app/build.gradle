@@ -69,6 +69,4 @@ dependencies {
     implementation "io.insert-koin:koin-androidx-workmanager:$koin_android_version"
     // Navigation Graph
     implementation "io.insert-koin:koin-androidx-navigation:$koin_android_version"
-    // Jetpack Compose
-    implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
 }
