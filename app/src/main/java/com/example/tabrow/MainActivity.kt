@@ -7,12 +7,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,13 +18,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tabrow.ui.theme.TabRowTheme
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val aViewModel: AViewModel by viewModel()
+    private val bViewModel: BViewModel by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,8 +37,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
                     Greeting(
-                        { AComposable() },
-                        { BComposable() }
+                        aViewModel.viewState.value,
+                        bViewModel.viewState.value,
+                        object : AViewModel.aClickEvent {
+                            override fun update() = aViewModel.updateMessage()
+                        },
+                        object : BViewModel.bClickEvent {
+                            override fun update() = bViewModel.updateMessage()
+                        }
                     )
                 }
             }
@@ -50,15 +55,15 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Greeting(
-    contentA: @Composable () -> Unit,
-    contentB: @Composable () -> Unit
+    aViewState: AViewModel.ViewState,
+    bViewState: BViewModel.ViewState,
+    aClickEvent: AViewModel.aClickEvent,
+    bClickEvent: BViewModel.bClickEvent
 ) {
-
     var state by rememberSaveable { mutableStateOf(0) }
     val listItems = listOf("tab1", "tab2")
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
     LazyColumn(
         state = listState
     ) {
@@ -96,41 +101,39 @@ fun Greeting(
                 }
             }
         }
+        when (state) {
+            0 -> showAComposable(aViewState, this, aClickEvent)
+            1 -> showBComposable(bViewState, this, bClickEvent)
+        }
+    }
+}
+
+fun showAComposable(
+    viewState: AViewModel.ViewState,
+    listScope: LazyListScope,
+    aClickEvent: AViewModel.aClickEvent
+) {
+    with(listScope) {
+        item { Text(modifier = Modifier.heightIn(min = 1000.dp), text = viewState.message) }
         item {
-            when (state) {
-                0 -> contentA()
-                1 -> contentB()
+            Button(onClick = { aClickEvent.update() }) {
+                Text("AAAAA")
             }
         }
     }
 }
 
-@Composable
-fun AComposable(vm: AViewModel = koinViewModel()) {
-    vm.updateMessage()
-    vm.viewState.value.let {
-        Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
+fun showBComposable(
+    viewState: BViewModel.ViewState,
+    listScope: LazyListScope,
+    bClickEvent: BViewModel.bClickEvent
+) {
+    with(listScope) {
+        item { Text(modifier = Modifier.heightIn(min = 1000.dp), text = viewState.message) }
+        item {
+            Button(onClick = { bClickEvent.update() }) {
+                Text("BBBBB")
+            }
+        }
     }
-
-}
-
-@Composable
-fun BComposable(vm: BViewModel = koinViewModel()) {
-    vm.updateMessage()
-    vm.viewState.value.let {
-        Text(modifier = Modifier.heightIn(min = 1000.dp), text = it.message)
-    }
-}
-
-@Preview(heightDp = 100)
-@Composable
-fun APreview() {
-    AComposable(vm = AViewModel())
-}
-
-
-@Preview(heightDp = 100)
-@Composable
-fun BPreview() {
-    BComposable(vm = BViewModel())
 }

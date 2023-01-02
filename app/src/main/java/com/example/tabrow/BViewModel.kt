@@ -27,4 +27,8 @@ class BViewModel : ViewModel() {
     companion object {
         val INITIAL = ViewState(message = "B")
     }
+
+    interface bClickEvent {
+        fun update()
+    }
 }

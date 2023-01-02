@@ -28,4 +28,8 @@ class AViewModel : ViewModel() {
     companion object {
         val INITIAL = ViewState(message = "A")
     }
+
+    interface aClickEvent {
+       fun update()
+    }
 }
