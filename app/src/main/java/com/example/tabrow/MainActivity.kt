@@ -98,8 +98,8 @@ fun Greeting(
         }
         item {
             when (state) {
-                0 -> AComposable()
-                1 -> BComposable()
+                0 -> contentA()
+                1 -> contentB()
             }
         }
     }
