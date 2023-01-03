@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             TabRowTheme {
-                var tabSelected by rememberSaveable { mutableStateOf(0) }
+                var tabSelected by rememberSaveable { mutableStateOf(Screen.A) }
                 val listState = rememberLazyListState()
                 val coroutineScope = rememberCoroutineScope()
 
@@ -60,10 +60,9 @@ fun greeting(
     listScope: LazyListScope,
     aViewModel: AViewModel,
     bViewModel: BViewModel,
-    tabSelected: Int,
-    onClickTab: (Int) -> Unit
+    tabSelected: Screen,
+    onClickTab: (Screen) -> Unit
 ) {
-    val listItems = listOf("tab1", "tab2")
     with(listScope) {
         item {
             Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear1")
@@ -79,13 +78,13 @@ fun greeting(
         }
         stickyHeader {
             TabRow(
-                selectedTabIndex = tabSelected, backgroundColor = Color.White
+                selectedTabIndex = tabSelected.ordinal, backgroundColor = Color.White
             ) {
-                listItems.forEachIndexed { index, title ->
+                Screen.values().map { it.name }.forEachIndexed { index, title ->
                     Tab(
                         text = { Text(text = title) },
-                        selected = tabSelected == index,
-                        onClick = { onClickTab(index) },
+                        selected = tabSelected.ordinal == index,
+                        onClick = { onClickTab(Screen.values()[index]) },
                         selectedContentColor = Color.Black,
                         unselectedContentColor = Color.Gray
                     )
@@ -93,14 +92,14 @@ fun greeting(
             }
         }
         when (tabSelected) {
-            0 -> showAComposable(
+            Screen.A -> showAComposable(
                 aViewModel.viewState.value,
                 this,
                 object : AViewModel.aClickEvent {
                     override fun update() = aViewModel.updateMessage()
                 }
             )
-            1 -> showBComposable(
+            Screen.B -> showBComposable(
                 bViewModel.viewState.value,
                 this,
                 object : BViewModel.bClickEvent {
@@ -139,4 +138,8 @@ fun showBComposable(
             }
         }
     }
+}
+
+enum class Screen {
+    A, B
 }
