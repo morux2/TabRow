@@ -32,16 +32,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
-                    Greeting(
-                        aViewModel.viewState.value,
-                        bViewModel.viewState.value,
-                        object : AViewModel.aClickEvent {
-                            override fun update() = aViewModel.updateMessage()
-                        },
-                        object : BViewModel.bClickEvent {
-                            override fun update() = bViewModel.updateMessage()
-                        }
-                    )
+                    Greeting(aViewModel, bViewModel)
                 }
             }
         }
@@ -51,10 +42,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Greeting(
-    aViewState: AViewModel.ViewState,
-    bViewState: BViewModel.ViewState,
-    aClickEvent: AViewModel.aClickEvent,
-    bClickEvent: BViewModel.bClickEvent
+    aViewModel: AViewModel,
+    bViewModel: BViewModel
 ) {
     var tabState by rememberSaveable { mutableStateOf(0) }
     val listItems = listOf("tab1", "tab2")
@@ -98,8 +87,20 @@ fun Greeting(
             }
         }
         when (tabState) {
-            0 -> showAComposable(aViewState, this, aClickEvent)
-            1 -> showBComposable(bViewState, this, bClickEvent)
+            0 -> showAComposable(
+                aViewModel.viewState.value,
+                this,
+                object : AViewModel.aClickEvent {
+                    override fun update() = aViewModel.updateMessage()
+                }
+            )
+            1 -> showBComposable(
+                bViewModel.viewState.value,
+                this,
+                object : BViewModel.bClickEvent {
+                    override fun update() = bViewModel.updateMessage()
+                }
+            )
         }
     }
 }
