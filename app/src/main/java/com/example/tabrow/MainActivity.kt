@@ -28,11 +28,27 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             TabRowTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
+                var tabSelected by rememberSaveable { mutableStateOf(0) }
+                val listState = rememberLazyListState()
+                val coroutineScope = rememberCoroutineScope()
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = listState
                 ) {
-                    Greeting(aViewModel, bViewModel)
+                    greeting(
+                        listScope = this,
+                        aViewModel = aViewModel,
+                        bViewModel = bViewModel,
+                        tabSelected = tabSelected,
+                        onClickTab = {
+                            tabSelected = it
+                            coroutineScope.launch {
+                                if (listState.firstVisibleItemIndex > 4)
+                                    listState.scrollToItem(4)
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -40,18 +56,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun Greeting(
+fun greeting(
+    listScope: LazyListScope,
     aViewModel: AViewModel,
-    bViewModel: BViewModel
+    bViewModel: BViewModel,
+    tabSelected: Int,
+    onClickTab: (Int) -> Unit
 ) {
-    var tabState by rememberSaveable { mutableStateOf(0) }
     val listItems = listOf("tab1", "tab2")
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    LazyColumn(
-        state = listState
-    ) {
+    with(listScope) {
         item {
             Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear1")
         }
@@ -66,27 +79,20 @@ fun Greeting(
         }
         stickyHeader {
             TabRow(
-                selectedTabIndex = tabState, backgroundColor = Color.White
+                selectedTabIndex = tabSelected, backgroundColor = Color.White
             ) {
-                // Add tabs for all of our pages
                 listItems.forEachIndexed { index, title ->
                     Tab(
                         text = { Text(text = title) },
-                        selected = tabState == index,
-                        onClick = {
-                            tabState = index
-                            coroutineScope.launch {
-                                if (listState.firstVisibleItemIndex > 4)
-                                    listState.scrollToItem(4)
-                            }
-                        },
+                        selected = tabSelected == index,
+                        onClick = { onClickTab(index) },
                         selectedContentColor = Color.Black,
                         unselectedContentColor = Color.Gray
                     )
                 }
             }
         }
-        when (tabState) {
+        when (tabSelected) {
             0 -> showAComposable(
                 aViewModel.viewState.value,
                 this,
