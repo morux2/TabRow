@@ -9,9 +9,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -34,6 +41,7 @@ class MainActivity : ComponentActivity() {
 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     state = listState
                 ) {
                     greeting(
@@ -44,8 +52,8 @@ class MainActivity : ComponentActivity() {
                         onClickTab = {
                             tabSelected = it
                             coroutineScope.launch {
-                                if (listState.firstVisibleItemIndex > 4)
-                                    listState.scrollToItem(4)
+                                if (listState.firstVisibleItemIndex > 5)
+                                    listState.scrollToItem(5)
                             }
                         }
                     )
@@ -64,17 +72,8 @@ fun greeting(
     onClickTab: (Screen) -> Unit
 ) {
     with(listScope) {
-        item {
-            Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear1")
-        }
-        item {
-            Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear2")
-        }
-        item {
-            Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear3")
-        }
-        item {
-            Text(modifier = Modifier.heightIn(min = 100.dp), text = "disappear4")
+        items(5) {
+            Text(modifier = Modifier.heightIn(min = 100.dp), text = "X")
         }
         stickyHeader {
             TabRow(
@@ -116,7 +115,7 @@ fun showAComposable(
     aClickEvent: AViewModel.aClickEvent
 ) {
     with(listScope) {
-        item { Text(modifier = Modifier.heightIn(min = 1000.dp), text = viewState.message) }
+        items(10) { Text(modifier = Modifier.heightIn(min = 100.dp), text = viewState.message + it.toString()) }
         item {
             Button(onClick = { aClickEvent.update() }) {
                 Text("AAAAA")
@@ -131,7 +130,7 @@ fun showBComposable(
     bClickEvent: BViewModel.bClickEvent
 ) {
     with(listScope) {
-        item { Text(modifier = Modifier.heightIn(min = 1000.dp), text = viewState.message) }
+        items(10) { Text(modifier = Modifier.heightIn(min = 100.dp), text = viewState.message + it.toString()) }
         item {
             Button(onClick = { bClickEvent.update() }) {
                 Text("BBBBB")
